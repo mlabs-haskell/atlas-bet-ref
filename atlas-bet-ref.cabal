@@ -1,0 +1,85 @@
+cabal-version:      3.8
+name:               atlas-ber-ref
+version:            0.6.2
+synopsis:           Betting reference example test-suite for Atlas
+description:
+license:            Apache-2.0
+license-file:       LICENSE
+build-type:         Simple
+category:           Blockchain, Cardano, Framework
+homepage:           https://github.com/geniusyield/atlas#readme
+extra-source-files: CHANGELOG.md
+                    README.md
+tested-with:
+  GHC ==9.6.5
+   || ==9.6.6
+
+common common
+  default-language:   GHC2021
+  default-extensions:
+    DataKinds
+    DefaultSignatures
+    DeriveAnyClass
+    DerivingStrategies
+    DerivingVia
+    GADTs
+    LambdaCase
+    MultiWayIf
+    OverloadedStrings
+    RecordWildCards
+    RoleAnnotations
+    TypeFamilyDependencies
+    UndecidableInstances
+    ViewPatterns
+
+  ghc-options:        -Wall -Wincomplete-uni-patterns -Wunused-packages
+
+  -- speed-ups GHCi considerably
+  ghc-options:        -fno-show-valid-hole-fits
+
+common plutus-ghc-options
+  -- so unfoldings are present even when compiled without optmizations
+  ghc-options:
+    -fno-ignore-interface-pragmas -fno-omit-interface-pragmas
+    -Wno-partial-type-signatures
+
+  -- expose all unfoldings, so plutustx compiler can do its job
+  ghc-options:
+    -fexpose-all-unfoldings -fobject-code
+    -fplugin-opt PlutusTx.Plugin:defer-errors
+
+  -- set target plutus-core version
+  ghc-options: -fplugin-opt PlutusTx.Plugin:target-version=1.0.0
+
+test-suite atlas-bet-ref
+  import:         common, plutus-ghc-options
+  type:           exitcode-stdio-1.0
+  main-is:        atlas-unified-tests.hs
+  hs-source-dirs: src
+  ghc-options:    -threaded -rtsopts -Wall
+
+  -- set target plutus-core version
+  ghc-options:    -fplugin-opt PlutusTx.Plugin:target-version=1.0.0
+
+  other-modules:
+    GeniusYield.Test.Unified.OnChain.BetRef
+    GeniusYield.Test.Unified.OnChain.BetRef.Compiled
+    GeniusYield.Test.Unified.BetRef.Operations
+    GeniusYield.Test.Unified.BetRef.PlaceBet
+    GeniusYield.Test.Unified.BetRef.TakePot
+
+  build-depends:
+    atlas-cardano ^>=0.6.2,
+    base ^>=4.18.2,
+    bytestring ^>=0.11.5,
+    cardano-api,
+    containers ^>=0.6.7,
+    extra,
+    lens ^>=5.2.3,
+    mtl ^>=2.3.1,
+    plutus-core,
+    plutus-ledger-api,
+    plutus-tx-plugin,
+    plutus-tx,
+    tasty ^>=1.5,
+    text ^>=2.0.2,
